@@ -653,6 +653,13 @@ drstk.backbone_modal.Application = Backbone.View.extend(
 					'choices':{0:'yes'},
 				});
 				settings.add({
+					'name':'base_map',
+					'value': options['base_map'] ? options['base_map'] : ['none'],
+					'label':'Special Basemap',
+					'tag':'select',
+					'choices':{'none':'none','1874':'1874'},
+				});
+				settings.add({
 					'name':'metadata',
 					'label':'Metadata',
 					'tag':'checkbox',
