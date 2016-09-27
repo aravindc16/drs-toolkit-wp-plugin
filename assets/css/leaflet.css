@@ -629,3 +629,7 @@
     height: 30px;
     line-height: 30px;
 }
+
+img.leaflet-image-layer{
+  max-height: none;
+}
