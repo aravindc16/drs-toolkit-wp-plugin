@@ -25,6 +25,11 @@ function drstk_map( $atts ){
   if (!isset($atts['orange_legend_desc']) && isset($atts['orange_desc'])){ $atts['orange_legend_desc'] = $atts['orange_desc']; }
 
   $shortcode = "<div id='map' data-story='".$story."' data-map_api_key='".$map_api_key."' data-map_project_key='".$map_project_key."'";
+  if (isset($atts['base_map'])){
+    if ($atts['base_map'] != "none"){
+      $shortcode .= " data-basemap='".$atts['base_map']."'";
+    }
+  }
 
   if (isset($atts['red_legend_desc']) && isset($atts['red'])) {
     $shortcode .= " data-red='".$atts['red']."'";
@@ -198,7 +203,7 @@ function drstk_map( $atts ){
       $abs = "Abstract/Description";
       $data->mods->$abs = $description;
       $cre = "Creator,Contributor";
-      $data->mods->$cre = $data->docs[0]->sourceResource->creator;
+      $data->mods->$cre = $data->docs[0]->sourceResource->creator || "";
       $date = "Date Created";
       $data->mods->$date = isset($data->docs[0]->sourceResource->date->displayDate) ? $data->docs[0]->sourceResource->date->displayDate : array();
       $data->canonical_object = new StdClass;
@@ -219,7 +224,7 @@ function drstk_map( $atts ){
         $coordinates = $data->docs[0]->sourceResource->spatial[0]->coordinates;
       }
       $permanentUrl = drstk_home_url() . "item/dpla:".$pid;
-      $map_html .= "<div class='coordinates' data-pid='".$pid."' data-url='".$permanentUrl."' data-coordinates='".$coordinates."' data-title='".htmlspecialchars($title[0], ENT_QUOTES, 'UTF-8')."'";
+      $map_html .= "<div class='coordinates' data-pid='".$pid."' data-url='".$permanentUrl."' data-coordinates='".$coordinates."' data-title='".htmlspecialchars($data->mods->Title[0], ENT_QUOTES, 'UTF-8')."'";
 
       if (isset($atts['metadata'])){
         $map_metadata = '';
@@ -227,8 +232,10 @@ function drstk_map( $atts ){
         foreach($metadata as $field){
           if (isset($data->mods->$field)) {
             $this_field = $data->mods->$field;
-            if (isset($this_field[0])) {
+            if (is_array($this_field)) {
               $map_metadata .= $this_field[0] . "<br/>";
+            } else {
+              $map_metadata .= $this_field . "<br/>";
             }
           }
         }
