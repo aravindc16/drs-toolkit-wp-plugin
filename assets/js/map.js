@@ -11,7 +11,9 @@ jQuery(document).ready(function($) {
 
     var mymap = createMap('map');
 
-    addTileLayerToMap(mymap, apiKey, projectKey);
+    var specialBase = $('#map').attr('data-basemap');
+
+    addTileLayerToMap(mymap, apiKey, projectKey, specialBase);
 
     var markerCluster = addPopupsToItems(items, mymap, colorGroups, home_url);
 
@@ -341,9 +343,10 @@ function addStoryModeToMap(drsitems, map, markerCluster, customItems) {
     }, 'Reset').addTo(map);
 }
 
-function addTileLayerToMap(map, apiKey, projectKey) {
+function addTileLayerToMap(map, apiKey, projectKey, specialBase) {
 
     var baseLayers = {};
+    var overlays = {};
 
     var openStreetMap = L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
@@ -371,9 +374,21 @@ function addTileLayerToMap(map, apiKey, projectKey) {
         openStreetMap.addTo(map);
     }
 
+    if (specialBase != ""){
+      var imageUrl = 'http://localhost/~beekerz/mapcrop.png';
 
-    L.control.layers(baseLayers).addTo(map);
+      var imageBounds = new L.latLngBounds([
+              [42.360890, -71.077749],
+              [42.346389, -71.042900]]);
 
+      var options = {opacity: .8};
+
+      var customOverlay = L.imageOverlay(imageUrl,imageBounds,options);
+      overlays['Historical'] = customOverlay;
+      customOverlay.addTo(map);
+    }
+
+    L.control.layers(baseLayers,overlays).addTo(map);
 }
 
 function getCustomItems(jqArray) {
