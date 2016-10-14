@@ -290,7 +290,37 @@ function get_item_image(){
   if (isset($data->thumbnails)){
     $img = $data->thumbnails[count($data->thumbnails)-2];
   }
-  if (isset($data->canonical_object)){
+  if (isset($data->page_objects)){
+   $pages = $data->page_objects;
+   if (count($pages) > 0){
+     $gallery_html = '<div class="carousel slide" id="single_carousel">';
+     $img_html = "";
+     $i = 0;
+     foreach($pages as $img=>$ordinal_value){
+       $img_html .= "<div class='item";
+       if ($i == 0){
+         $img_html .= " active";
+       }
+       $img_html .= "'><a href='' data-toggle='modal' data-target='#drs_item_modal' class='drs_page_image' data-img='".$img."' data-ordinal_value='".$ordinal_value."'><img";
+       if ($i == 0){
+         $img_html .= " src='".$img."'";
+       } else {
+         $img_html .= " data-src='".$img."'";
+       }
+       $img_html .= "/></a><div class='carousel-caption'><a href='' data-toggle='modal' data-target='drs_item_modal' class='drs_item_modal' data-img='".$img."' data-ordinal_value='".$ordinal_value."'>Page ".$ordinal_value."</a></div></div>";
+       $i++;
+     }
+     $gallery_html .= '<div class="carousel-inner">'.$img_html.'</div>';
+     $gallery_html .= '<a class="left carousel-control" href="#single_carousel" role="button" data-slide="prev"><i class="glyphicon-chevron-left fa fa-chevron-left" aria-hidden="true"></i><span class="sr-only">Previous</span></a><a class="right carousel-control" href="#single_carousel" role="button" data-slide="next"><i class="glyphicon-chevron-right fa fa-chevron-right" aria-hidden="true"></i><span class="sr-only">Next</span></a>';
+     $gallery_html .= '</div>';
+     $gallery_html .= '<div class="modal fade" id="drs_item_modal"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title">Page Images</h4></div><div class="modal-body"><nav class="pagination"><ul class="pagination"><li><a href="#" class="drs_page_image prev"><span class="fa fa-chevron-left"></span></a></li>';
+     foreach($pages as $img=>$ordinal_value){
+       $gallery_html .= "<li><a href='#' class='drs_page_image' data-img='".$img."' data-ordinal_value='".$ordinal_value."'>".$ordinal_value."</a></li>";
+     }
+     $gallery_html .= '<li><a href="#" class="drs_page_image next"><span class="fa fa-chevron-right"></span></a></li></ul></nav><div class="body"></div></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div><!-- /.modal-content --></div><!-- /.modal-dialog --></div><!-- /.modal -->';
+     echo $gallery_html;
+   }
+ } else if (isset($data->canonical_object)){
     $val = current($data->canonical_object);
     $key = key($data->canonical_object);
     if ($val == 'Master Image'){
@@ -328,37 +358,6 @@ function get_item_image(){
     //case where there is no canonical_objects set
     echo  '<img id="drs-item-img" src="'.$img.'" />';
   }
-  if (isset($data->page_objects)){
-    $pages = $data->page_objects;
-    if (count($pages) > 0){
-      $gallery_html = '<div class="carousel slide" id="single_carousel">';
-      $img_html = "";
-      $i = 0;
-      foreach($pages as $img=>$ordinal_value){
-        $img_html .= "<div class='item";
-        if ($i == 0){
-          $img_html .= " active";
-        }
-        $img_html .= "'><a href='' data-toggle='modal' data-target='#drs_item_modal' class='drs_page_image' data-img='".$img."' data-ordinal_value='".$ordinal_value."'><img";
-        if ($i == 0){
-          $img_html .= " src='".$img."'";
-        } else {
-          $img_html .= " data-src='".$img."'";
-        }
-        $img_html .= "/></a><div class='carousel-caption'><a href='' data-toggle='modal' data-target='drs_item_modal' class='drs_item_modal' data-img='".$img."' data-ordinal_value='".$ordinal_value."'>Page ".$ordinal_value."</a></div></div>";
-        $i++;
-      }
-      $gallery_html .= '<div class="carousel-inner">'.$img_html.'</div>';
-      $gallery_html .= '<a class="left carousel-control" href="#single_carousel" role="button" data-slide="prev"><i class="glyphicon-chevron-left fa fa-chevron-left" aria-hidden="true"></i><span class="sr-only">Previous</span></a><a class="right carousel-control" href="#single_carousel" role="button" data-slide="next"><i class="glyphicon-chevron-right fa fa-chevron-right" aria-hidden="true"></i><span class="sr-only">Next</span></a>';
-      $gallery_html .= '</div>';
-      $gallery_html .= '<div class="modal fade" id="drs_item_modal"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title">Page Images</h4></div><div class="modal-body"><nav class="pagination"><ul class="pagination"><li><a href="#" class="drs_page_image prev"><span class="fa fa-chevron-left"></span></a></li>';
-      foreach($pages as $img=>$ordinal_value){
-        $gallery_html .= "<li><a href='#' class='drs_page_image' data-img='".$img."' data-ordinal_value='".$ordinal_value."'>".$ordinal_value."</a></li>";
-      }
-      $gallery_html .= '<li><a href="#" class="drs_page_image next"><span class="fa fa-chevron-right"></span></a></li></ul></nav><div class="body"></div></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div></div><!-- /.modal-content --></div><!-- /.modal-dialog --></div><!-- /.modal -->';
-      echo $gallery_html;
-    }
-  }
 }
 
 function get_associated_files(){
@@ -392,30 +391,50 @@ function get_associated_files(){
 
 function get_related_content(){
   global $wp_query, $post, $item_pid;
+  $title = (get_option('drstk_appears_title') != "") ? get_option('drstk_appears_title') : "Item Appears In";
   if (get_option('drstk_appears') == 'on'){
     $pidnum = explode(":", $item_pid);
-    if (count($pidnum) > 1){
-      $pidnum = $pidnum[1];
-      $title = (get_option('drstk_appears_title') != "") ? get_option('drstk_appears_title') : "Item Appears In";
-      $query_args = array( 's' => $pidnum, 'post_type'=>array('post', 'page'), 'posts_per_page'=>3);
-
-      $wp_query = new WP_Query( $query_args );
-
-      $rel_query = relevanssi_do_query($wp_query);
-      if (count($rel_query) > 0){
-        echo '<div class="panel panel-default related_content"><div class="panel-heading">'.$title.'</div><div class="panel-body">';
-        foreach($rel_query as $r_post){
-          $post = $r_post;
-          $the_post = $post;
-          get_template_part( 'content', 'excerpt' );
-        }
-        echo "</div></div>";
-      } else {
-        //no related content
-      }
-      wp_reset_postdata();
+    if (count($pidnum) > 0){
+      $pidnum = $pidnum[0];
+      echo '<div class="panel panel-default related_content"><div class="panel-heading">'.$title.'</div><div class="panel-body">';
+      do_related_content_query($pidnum, 1);
+      echo "</div></div>";
     }
   }
+}
+
+function do_related_content_query($pid, $paged){
+  global $wp_query, $post;
+  $query_args = array( 's' => $pid, 'post_type'=>array('post', 'page'), 'posts_per_page'=>2, 'paged'=>$paged, 'post_status'=>'publish');
+  $wp_query = new WP_Query( $query_args );
+
+  $rel_query = relevanssi_do_query($wp_query);
+  if (count($rel_query) > 0){
+    foreach($rel_query as $r_post){
+      $post = $r_post;
+      $the_post = $post;
+      get_template_part( 'content', 'excerpt' );
+    }
+    if (count($rel_query) > 2){
+      echo the_posts_pagination( array( 'mid_size'  => 2 ) );
+    }
+  } else {
+    //no related content
+  }
+  wp_reset_postdata();
+}
+
+
+add_action( 'wp_ajax_get_related_content_paginated', 'related_content_paginated_handler' ); //for auth users
+add_action( 'wp_ajax_nopriv_get_related_content_paginated', 'related_content_paginated_handler' ); //for nonauth users
+function related_content_paginated_handler(){
+  global $post, $errors;
+  if (isset($_GET['pid']) && isset($_GET['page']) && $_GET['page'] != null && $_GET['pid'] != NULL){
+    $pid = $_GET['pid'];
+    $page = intval($_GET['page']);
+    do_related_content_query($pid, $page);
+  }
+  die();
 }
 
 function check_for_bad_data($data){

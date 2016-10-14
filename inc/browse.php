@@ -57,7 +57,7 @@ function ajax_wp_search(){
   $query_string = isset($_GET['query']) ? $_GET['query'] : "";
   $paged = $_GET['page'];
   if (isset($_GET['query']) && $query_string != ''){
-    $query_args = array( 's' => $query_string, 'post_type'=>array('post', 'page'), 'posts_per_page'=>3, 'paged'=>$paged);
+    $query_args = array( 's' => $query_string, 'post_type'=>array('post', 'page'), 'posts_per_page'=>3, 'paged'=>$paged, 'post_status'=>'publish');
     $wp_query = new WP_Query( $query_args );
     $rel_query = relevanssi_do_query($wp_query);
     if (count($rel_query) > 0){
@@ -66,6 +66,7 @@ function ajax_wp_search(){
         $the_post = $post;
         get_template_part( 'content', 'excerpt' );
       }
+      echo the_posts_pagination( array( 'mid_size'  => 2 ) );
     } else {
       echo "No ".strtolower($related_content_title)." was found";
     }
